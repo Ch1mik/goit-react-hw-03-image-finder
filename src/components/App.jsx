@@ -18,6 +18,7 @@ class App extends Component {
     loading: false,
     largeImegeURL: '',
     tags: '',
+    totalHits: 0,
   };
 
   toggleModal = (imageURL, tag) => {
@@ -45,6 +46,7 @@ class App extends Component {
               name: name,
               page: state.page + 1,
               loading: false,
+              totalHits: response.data.totalHits,
             }));
           }
           else {
@@ -53,6 +55,7 @@ class App extends Component {
               name: name,
               page: state.page + 1,
               loading: false,
+              totalHits: response.data.totalHits,
             }));
           }
         });
@@ -62,7 +65,12 @@ class App extends Component {
   };
 
   loadMore = () => {
-    this.getValue(this.state);
+    const { hits, page, name, totalHits } = this.state;
+    if (hits.length < totalHits) {
+      this.getValue({ name, page });
+    } else {
+      console.log('No more images to load!');
+    }
   };
 
   render () {
@@ -78,8 +86,8 @@ class App extends Component {
          )}
          {showModal && (<Modal onClose={this.toggleModal} url={largeImegeURL} alt={tags} />)}
          {loading && <SpinnerLoader />}
-         {hits.length > 0 && (
-          <LoadMoreButton onButtonClick={() => this.loadMore()} />
+         {hits.length < this.state.totalHits && (
+          <LoadMoreButton onButtonClick={this.loadMore} />
          )}
       </div>
     );
